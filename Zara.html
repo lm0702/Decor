@@ -1,0 +1,279 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<!-- Responsive viewport for true auto adjustment -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>Zara</title><link rel="icon" href="Decor.jpeg" type="image/jpeg">
+<meta property="og:image" content="Zara.jpeg"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+<style>
+  /* ----- base reset + remove blue tap ----- */
+  *{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    /* no more blue highlight on tap */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* allow text selection inside bio if needed */
+  .bio {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+  }
+
+  body,html{
+    height:100%;
+    width:100%;
+    overflow:hidden;
+    color:white;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* ----- video background: less blur + always cover any screen ----- */
+  .video-bg{
+    position:fixed;
+    top: 50%;
+    left: 50%;
+    min-width:100%;
+    min-height:100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%) scale(1.02);
+    object-fit: cover;           /* perfect fit on all resolutions */
+    filter: blur(0.8px) brightness(0.85);  /* reduced blur (was 2px) */
+    z-index:-2;
+  }
+
+  .overlay{
+    position:fixed;
+    width:100%;
+    height:100%;
+    backdrop-filter: blur(2px);   /* softer overlay blur (was 4px) – keeps readability but lighter */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.4)); /* slightly lighter */
+    z-index:-1;
+  }
+
+  /* ----- main container – fully fluid, smooth, auto-everything ----- */
+  .container{
+    height: 100vh;
+    height: 100dvh;              /* dynamic for mobile */
+    width: 100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;  /* keeps top alignment as original */
+    padding: clamp(40px, 8vh, 75px) 5% 0 5%;  /* responsive top padding */
+    text-align:center;
+    overflow-y:auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+  }
+
+  .container::-webkit-scrollbar {
+    width: 5px;
+  }
+  .container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+  }
+
+  /* profile picture – keeps original 185px but scales on tiny screens */
+  .profile{
+    width: min(185px, 60vw);
+    height: min(185px, 60vw);
+    max-width: 200px;
+    max-height: 200px;
+    border-radius:50%;
+    overflow:hidden;
+    border:2px solid rgba(255,255,255,0.5);
+    box-shadow:0 10px 40px rgba(0,0,0,0.35);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+    flex-shrink:0;
+  }
+
+  .profile:hover{
+    transform: scale(1.06);
+  }
+  .profile:active{
+    transform: scale(0.92);
+  }
+
+  .profile img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  /* name – fluid between 28px and 42px */
+  .name{
+    margin-top: clamp(12px, 3vh, 20px);
+    font-family:'Playfair Display', serif;
+    font-size: clamp(28px, 8vw, 42px);
+    letter-spacing:1.2px;
+    text-shadow:0 4px 18px rgba(0,0,0,0.45);
+    line-height:1.2;
+    word-break:break-word;
+  }
+
+  /* social icons – flexible, wrap-friendly */
+  .socials{
+    margin-top: clamp(16px, 3vh, 22px);
+    display:flex;
+    gap: clamp(16px, 4vw, 26px);
+    flex-wrap:wrap;
+    justify-content:center;
+    align-items:center;
+    padding:0 8px;
+  }
+
+  .socials a{
+    width: clamp(52px, 12vw, 62px);
+    height: clamp(52px, 12vw, 62px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter: blur(14px);
+    border:1px solid rgba(255,255,255,0.35);
+    color:white;
+    font-size: clamp(22px, 5vw, 28px);
+    text-decoration:none;
+    box-shadow:0 6px 18px rgba(0,0,0,0.25);
+    transition: all 0.25s ease;
+  }
+
+  .socials a:hover{
+    transform: scale(1.12);
+    background:rgba(255,255,255,0.25);
+  }
+  .socials a:active{
+    transform: scale(0.85);
+  }
+
+  /* bio – now fully responsive width and padding */
+  .bio{
+    margin-top: clamp(20px, 3.5vh, 30px);
+    width:100%;
+    max-width: 700px;            /* a bit wider for large screens, still elegant */
+    font-size: clamp(14px, 2.2vw, 17px);
+    line-height:1.6;
+    opacity:0.92;
+    background:rgba(255,255,255,0.08);
+    padding: clamp(14px, 3%, 22px) clamp(18px, 4%, 26px);
+    border-radius:18px;
+    backdrop-filter: blur(12px);
+    border:1px solid rgba(255,255,255,0.18);
+    box-shadow:0 6px 20px rgba(0,0,0,0.25);
+    word-break:break-word;
+  }
+
+  /* footer – always visible, adaptive font */
+  .footer{
+    position:fixed;
+    bottom: clamp(8px, 2vh, 12px);
+    width:100%;
+    text-align:center;
+    font-size: clamp(12px, 3.5vw, 15px);
+    letter-spacing:1px;
+    opacity:0.85;
+    font-family:'Playfair Display', serif;
+    text-shadow:0 2px 10px rgba(0,0,0,0.5);
+    pointer-events:none;
+    padding:0 5px;
+  }
+
+  .footer span{
+    opacity:0.9;
+    display:inline-block;
+  }
+
+  /* ----- special tuning for very short / landscape devices ----- */
+  @media (max-height: 600px) and (orientation: landscape) {
+    .container {
+      padding-top: 15px;
+    }
+    .profile {
+      width: 130px;
+      height: 130px;
+    }
+    .name {
+      margin-top: 6px;
+      font-size: 26px;
+    }
+    .socials {
+      margin-top: 10px;
+      gap: 16px;
+    }
+    .bio {
+      margin-top: 12px;
+      padding: 12px 18px;
+      max-width: 85%;
+    }
+  }
+
+  /* for very narrow phones (< 360px) */
+  @media (max-width: 360px) {
+    .profile {
+      width: 150px;
+      height: 150px;
+    }
+    .socials a {
+      width: 50px;
+      height: 50px;
+      font-size: 22px;
+    }
+  }
+
+  /* for very tall screens: vertical center look (optional, keeps original top but feels balanced) */
+  @media (min-height: 900px) {
+    .container {
+      justify-content: center;   /* slightly more elegant on big screens */
+      padding-top: 2vh;
+    }
+  }
+</style>
+</head>
+<body>
+<video autoplay muted loop class="video-bg">
+  <source src="Zara.mp4" type="video/mp4">
+</video>
+<div class="overlay"></div>
+<div class="container">
+  <div class="profile">
+    <img src="Zara.jpeg" alt="Profile">
+  </div>
+  <div class="name">Zara</div>
+  <div class="socials">
+    <a href="https://www.tiktok.com/@z11meoww" target="_blank">
+      <i class="fa-brands fa-tiktok"></i>
+    </a>
+    <a href="https://www.instagram.com/z11meow" target="_blank">
+      <i class="fa-brands fa-instagram"></i>
+    </a>
+    <!-- Telegram icon -->
+    <a href="https://t.me/bloodycum" target="_blank">
+      <i class="fa-brands fa-telegram"></i>
+    </a>
+    <!-- Discord icon -->
+    <a href="https://discord.gg/NWtyXdDsSP" target="_blank">
+      <i class="fa-brands fa-discord"></i>
+    </a>
+  </div>
+  <div class="bio"> Zara one of my favorite person i met Zara through Kate’s live streams, and after, I started watching Zara’s own streams. She has become one of my favorite hosts! Zara is such a kind, amazing, and intelligent person. She has a great sense of humor, which makes her streams so fun and enjoyable. I always love joining her live streams and spending time there, it’s truly a positive and entertaining experience.</div>
+</div>
+<div class="footer">
+  © <span>𝓚 𝓩 メ𝐃𝐞𝐜𝐨r</span>
+</div>
+</body>
+</html>

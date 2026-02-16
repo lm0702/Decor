@@ -1,0 +1,478 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8">
+<!-- Responsive viewport -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>Contact & Review</title>
+<link rel="icon" href="Decor.jpeg" type="image/jpeg">
+<!-- Font Awesome 6 (free) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* allow typing in form fields */
+  input, textarea, .rating-box {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+  }
+
+  body, html {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  /* same video background (Decor.mp4) */
+  .video-bg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%) scale(1.02);
+    object-fit: cover;
+    filter: blur(0.8px) brightness(0.85);
+    z-index: -2;
+  }
+
+  .overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(2px);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.15), rgba(0,0,0,0.4));
+    z-index: -1;
+  }
+
+  /* scrollable container – similar to main page */
+  .contact-container {
+    height: 100vh;
+    height: 100dvh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(30px, 6vh, 60px) 5% 30px 5%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+  }
+
+  .contact-container::-webkit-scrollbar {
+    width: 5px;
+  }
+  .contact-container::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+  }
+
+  /* header with back link (optional but user-friendly) */
+  .back-link {
+    align-self: flex-start;
+    margin-bottom: 15px;
+  }
+  .back-link a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(8px);
+    padding: 8px 18px;
+    border-radius: 40px;
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: 0.2s;
+  }
+  .back-link a:hover {
+    background: rgba(255,255,255,0.2);
+    transform: scale(1.02);
+  }
+
+  /* main form card – glassmorphism */
+  .form-card {
+    width: 100%;
+    max-width: 650px;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 32px;
+    padding: clamp(25px, 5%, 45px) clamp(20px, 4%, 40px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    margin-bottom: 25px;
+  }
+
+  .form-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 38px);
+    font-weight: 500;
+    text-align: center;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  .form-sub {
+    text-align: center;
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 30px;
+    border-bottom: 1px dashed rgba(255,255,255,0.3);
+    padding-bottom: 15px;
+  }
+
+  /* form fields */
+  .input-group {
+    margin-bottom: 25px;
+    text-align: left;
+  }
+
+  .input-group label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    opacity: 0.9;
+    margin-left: 5px;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    width: 100%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 30px;
+    padding: 14px 22px;
+    font-size: 1rem;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    outline: none;
+    transition: all 0.2s;
+    backdrop-filter: blur(5px);
+  }
+
+  .input-group input:focus,
+  .input-group textarea:focus {
+    border-color: rgba(255,255,255,0.7);
+    background: rgba(0,0,0,0.45);
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+  }
+
+  .input-group textarea {
+    min-height: 120px;
+    resize: vertical;
+    border-radius: 28px;
+  }
+
+  /* star rating (5 stars) */
+  .rating-group {
+    margin-bottom: 30px;
+    text-align: left;
+  }
+
+  .rating-group label {
+    display: block;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+    opacity: 0.9;
+    margin-left: 5px;
+  }
+
+  .stars {
+    display: flex;
+    flex-direction: row-reverse;  /* makes hover effect natural (right to left) */
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .stars input {
+    display: none;
+  }
+
+  .stars label {
+    font-size: 2.2rem;
+    color: rgba(255,255,215,0.3);
+    cursor: pointer;
+    transition: 0.15s;
+    margin: 0;
+    line-height: 1;
+  }
+
+  .stars label:hover,
+  .stars label:hover ~ label,
+  .stars input:checked ~ label {
+    color: #FFD966;
+    text-shadow: 0 0 15px #FFB347;
+  }
+
+  /* submit button */
+  .submit-btn {
+    width: 100%;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 60px;
+    padding: 16px 25px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    text-transform: uppercase;
+    backdrop-filter: blur(12px);
+    cursor: pointer;
+    transition: 0.25s;
+    margin-top: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  }
+
+  .submit-btn:hover {
+    background: rgba(255,255,255,0.3);
+    transform: scale(1.02);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+  }
+
+  .submit-btn:active {
+    transform: scale(0.97);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* status message */
+  .form-status {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 1rem;
+    padding: 10px;
+    border-radius: 40px;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+    display: none;
+  }
+
+  .form-status.success {
+    display: block;
+    color: #a5d6a5;
+    border: 1px solid #a5d6a5;
+  }
+
+  .form-status.error {
+    display: block;
+    color: #f4acb7;
+    border: 1px solid #f4acb7;
+  }
+
+  /* footer (same as main page) */
+  .footer {
+    position: fixed;
+    bottom: clamp(8px, 2vh, 12px);
+    width: 100%;
+    text-align: center;
+    font-size: clamp(12px, 3.5vw, 15px);
+    opacity: 0.85;
+    font-family: 'Playfair Display', serif;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    pointer-events: none;
+    padding: 0 5px;
+  }
+
+  .footer span {
+    opacity: 0.9;
+    display: inline-block;
+  }
+
+  /* placeholder style */
+  ::placeholder {
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+  }
+
+  /* responsive touches */
+  @media (max-width: 450px) {
+    .stars label {
+      font-size: 2rem;
+    }
+    .form-card {
+      padding: 20px 18px;
+    }
+  }
+
+  @media (max-height: 600px) and (orientation: landscape) {
+    .contact-container {
+      padding-top: 15px;
+    }
+    .form-card {
+      padding: 15px;
+    }
+    .input-group input {
+      padding: 10px 18px;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- same video background (shared with main page) -->
+  <video autoplay muted loop class="video-bg">
+    <source src="Decor.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+
+  <div class="contact-container">
+    <!-- optional back to home (index.html) — you can adjust the href to your main page -->
+    <div class="back-link">
+      <a href="index.html"><i class="fa-solid fa-arrow-left"></i> back </a>
+    </div>
+
+    <!-- contact & review form card -->
+    <div class="form-card">
+      <div class="form-title">✧ Contact & Review ✧</div>
+      <div class="form-sub">I’d love to hear from you</div>
+
+      <form id="contact-form">
+        <!-- Name -->
+        <div class="input-group">
+          <label><i class="fa-regular fa-user" style="margin-right: 6px;"></i> Name</label>
+          <input type="text" name="user_name" id="user_name" placeholder="Your full name" required>
+        </div>
+
+        <!-- Email -->
+        <div class="input-group">
+          <label><i class="fa-regular fa-envelope" style="margin-right: 6px;"></i> Email</label>
+          <input type="email" name="user_email" id="user_email" placeholder="your@email.com" required>
+        </div>
+
+        <!-- Message -->
+        <div class="input-group">
+          <label><i class="fa-regular fa-message" style="margin-right: 6px;"></i> Message / Review</label>
+          <textarea name="message" id="message" placeholder="Tell us about your experience..."></textarea>
+        </div>
+
+        <!-- 5 Stars Rating -->
+        <div class="rating-group">
+          <label><i class="fa-regular fa-star" style="margin-right: 6px;"></i> Your rating</label>
+          <div class="stars">
+            <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="5 stars">★</label>
+            <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="4 stars">★</label>
+            <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="3 stars">★</label>
+            <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="2 stars">★</label>
+            <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="1 star">★</label>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="submit-btn" id="submit-btn">send review <i class="fa-regular fa-paper-plane" style="margin-left: 8px;"></i></button>
+        
+        <!-- Status message -->
+        <div id="form-status" class="form-status"></div>
+      </form>
+    </div> <!-- end form-card -->
+  </div> <!-- end contact-container -->
+
+  <!-- footer (exactly like main page, maybe with same text) -->
+  <div class="footer">
+    © <span>𝓚 𝓩 メ𝐃𝐞𝐜𝐨r</span>
+  </div>
+
+  <script>
+    // Initialize EmailJS with your public key
+    (function() {
+      emailjs.init("Z1ra9H38Wjw3ZADCg"); // ← REPLACE WITH YOUR ACTUAL PUBLIC KEY
+    })();
+
+    // Handle form submission
+    document.getElementById('contact-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      // Get form elements
+      const submitBtn = document.getElementById('submit-btn');
+      const statusDiv = document.getElementById('form-status');
+      const userName = document.getElementById('user_name').value;
+      const userEmail = document.getElementById('user_email').value;
+      const message = document.getElementById('message').value;
+      
+      // Get selected rating
+      const ratingInputs = document.getElementsByName('rating');
+      let selectedRating = 'Not rated';
+      for (let i = 0; i < ratingInputs.length; i++) {
+        if (ratingInputs[i].checked) {
+          selectedRating = ratingInputs[i].value + ' stars';
+          break;
+        }
+      }
+
+      // Disable button and show sending status
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'sending... <i class="fa-regular fa-spinner fa-spin"></i>';
+      statusDiv.className = 'form-status';
+      statusDiv.style.display = 'none';
+
+      // Prepare template parameters
+      const templateParams = {
+        user_name: userName,
+        user_email: userEmail,
+        message: message,
+        rating: selectedRating,
+        reply_to: userEmail
+      };
+
+      // Send email using EmailJS
+      // REPLACE WITH YOUR ACTUAL SERVICE ID AND TEMPLATE ID
+      emailjs.send('service_n1oydnm', 'template_9kdxeae', templateParams)
+        .then(function(response) {
+          console.log('SUCCESS!', response.status, response.text);
+          // Show success message
+          statusDiv.innerHTML = '✓ Thank you! Your review has been sent.';
+          statusDiv.className = 'form-status success';
+          statusDiv.style.display = 'block';
+          
+          // Reset form
+          document.getElementById('contact-form').reset();
+          
+          // Re-enable button
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'send review <i class="fa-regular fa-paper-plane" style="margin-left: 8px;"></i>';
+          
+          // Hide success message after 5 seconds
+          setTimeout(() => {
+            statusDiv.style.display = 'none';
+          }, 5000);
+        })
+        .catch(function(error) {
+          console.log('FAILED...', error);
+          // Show error message
+          statusDiv.innerHTML = '✗ Failed to send. Please try again or contact directly.';
+          statusDiv.className = 'form-status error';
+          statusDiv.style.display = 'block';
+          
+          // Re-enable button
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'send review <i class="fa-regular fa-paper-plane" style="margin-left: 8px;"></i>';
+        });
+    });
+  </script>
+</body>
+</html>
