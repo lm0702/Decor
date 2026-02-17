@@ -106,6 +106,7 @@
     backdrop-filter: blur(10px);
     transition: transform 0.3s ease;
     flex-shrink:0;
+    cursor: pointer;  /* shows it's clickable */
   }
 
   .profile:hover{
@@ -113,6 +114,31 @@
   }
   .profile:active{
     transform: scale(0.92);
+  }
+
+  /* add a subtle "click me" hint on hover */
+  .profile::after {
+    content: "🔊";
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(5px);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+
+  .profile:hover::after {
+    opacity: 0.9;
   }
 
   .profile img{
@@ -206,6 +232,36 @@
     display:inline-block;
   }
 
+  /* simple audio player hidden */
+  .hidden-audio {
+    display: none;
+  }
+
+  /* brief visual feedback when meow plays */
+  .meow-feedback {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 60px;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    transition: opacity 0.2s ease;
+    text-shadow: 0 0 20px rgba(255,255,255,0.8);
+  }
+
+  .meow-feedback.show {
+    opacity: 1;
+    animation: meowPop 0.4s ease forwards;
+  }
+
+  @keyframes meowPop {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+  }
+
   /* ----- special tuning for very short / landscape devices ----- */
   @media (max-height: 600px) and (orientation: landscape) {
     .container {
@@ -257,8 +313,18 @@
   <source src="Zara.mp4" type="video/mp4">
 </video>
 <div class="overlay"></div>
+
+<!-- hidden audio element for meow sound -->
+<audio id="meowSound" class="hidden-audio" preload="auto">
+  <source src="Meow.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<!-- visual feedback emoji (cute cat face) -->
+<div id="meowFeedback" class="meow-feedback">😺</div>
+
 <div class="container">
-  <div class="profile">
+  <div class="profile" id="profileClick">
     <img src="Zara.jpeg" alt="Profile">
   </div>
   <div class="name">Zara</div>
@@ -278,11 +344,59 @@
       <i class="fa-brands fa-discord"></i>
     </a>
   </div>
-  <div class="bio"> Zara one of my favorite person i met Zara through Kate’s live streams, and after, I started watching Zara’s own streams. She has become one of my favorite hosts! Zara is such a kind, amazing, and intelligent person. She has a great sense of humor, which makes her streams so fun and enjoyable. I always love joining her live streams and spending time there, it’s truly a positive and entertaining experience.</div>
+  <div class="bio"> Zara one of my favorite person i met Zara through Kate's live streams, and after, I started watching Zara's own streams. She has become one of my favorite hosts! Zara is such a kind, amazing, and intelligent person. She has a great sense of humor, which makes her streams so fun and enjoyable. I always love joining her live streams and spending time there, it's truly a positive and entertaining experience.</div>
 </div>
 <div class="footer">
   © <span>𝓚 𝓩 メ𝐃𝐞𝐜𝐨r</span>
 </div>
-</body>
 
+<script>
+  // Play Meow.mp3 when profile picture is clicked
+  document.addEventListener('DOMContentLoaded', function() {
+    const profile = document.getElementById('profileClick');
+    const meowSound = document.getElementById('meowSound');
+    const meowFeedback = document.getElementById('meowFeedback');
+    
+    // Try to preload the audio
+    meowSound.load();
+    
+    profile.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Play the meow sound
+      meowSound.currentTime = 0; // Reset to start if already playing
+      meowSound.play().catch(error => {
+        console.log("Audio playback failed:", error);
+        // Most browsers require user interaction first - this is fine since click is user interaction
+      });
+      
+      // Show visual cat emoji feedback
+      meowFeedback.classList.add('show');
+      
+      // Remove the class after animation completes
+      setTimeout(() => {
+        meowFeedback.classList.remove('show');
+      }, 400);
+      
+      // Add a little extra bounce to the profile pic
+      profile.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        profile.style.transform = '';
+      }, 200);
+    });
+
+    // Optional: Add touch feedback for mobile
+    profile.addEventListener('touchstart', function() {
+      profile.style.transform = 'scale(0.95)';
+    });
+
+    profile.addEventListener('touchend', function() {
+      setTimeout(() => {
+        profile.style.transform = '';
+      }, 100);
+    });
+  });
+</script>
+
+</body>
 </html>
